@@ -82,9 +82,7 @@ export default function Navbar() {
                                 Resume
                             </Button>
                         </Link>
-                        <div className="flex justify-start">
-                            <ThemeToggle />
-                        </div>
+
                     </Container>
                 </div>
             )}
