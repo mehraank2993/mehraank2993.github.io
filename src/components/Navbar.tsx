@@ -1,57 +1,93 @@
-'use client';
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Menu, X, Code2 } from 'lucide-react';
-import ResumeButton from './ResumeButton';
-import './Navbar.css';
+"use client";
 
-const Navbar = () => {
-    const [isOpen, setIsOpen] = useState(false);
+import * as React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Menu, X, FileText } from "lucide-react";
+import { Container } from "@/components/ui/Container";
+import { Button } from "@/components/ui/Button";
+import { cn } from "@/lib/utils";
+
+const navLinks = [
+    { href: "#home", label: "Home" },
+    { href: "#about", label: "About" },
+    { href: "#skills", label: "Skills" },
+    { href: "#projects", label: "Projects" },
+    { href: "#contact", label: "Contact" },
+];
+
+export default function Navbar() {
+    const [isOpen, setIsOpen] = React.useState(false);
     const pathname = usePathname();
 
-    const toggleMenu = () => setIsOpen(!isOpen);
-    const closeMenu = () => setIsOpen(false);
-
-    const navItems = [
-        { name: 'Home', path: '/' },
-        { name: 'About', path: '/about' },
-        { name: 'Projects', path: '/projects' },
-        { name: 'Skills', path: '/skills' },
-        { name: 'Contact', path: '/contact' },
-    ];
-
     return (
-        <nav className="navbar">
-            <div className="container nav-container">
-                <Link href="/" className="nav-logo" onClick={closeMenu}>
-                    <Code2 className="mr-2 text-accent" />
-                    Mehraan<span>Khan</span>
+        <header className="sticky top-0 z-50 w-full border-b border-neutral-200 dark:border-neutral-800 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-md">
+            <Container className="flex h-16 items-center justify-between">
+                <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight">
+                    <span>Mehraan Khan</span>
                 </Link>
 
-                <button className="mobile-toggle" onClick={toggleMenu} aria-label="Toggle menu">
-                    {isOpen ? <X size={24} /> : <Menu size={24} />}
-                </button>
-
-                <ul className={`nav-links ${isOpen ? 'open' : ''}`}>
-                    {navItems.map((item) => (
-                        <li key={item.name}>
-                            <Link
-                                href={item.path}
-                                className={`nav-link ${pathname === item.path ? 'active' : ''}`}
-                                onClick={closeMenu}
-                            >
-                                {item.name}
-                            </Link>
-                        </li>
+                {/* Desktop Nav */}
+                <nav className="hidden md:flex items-center gap-6">
+                    {navLinks.map((link) => (
+                        <Link
+                            key={link.href}
+                            href={link.href}
+                            className={cn(
+                                "text-sm font-medium transition-colors hover:text-neutral-900 dark:hover:text-neutral-100",
+                                pathname === link.href ? "text-neutral-900 dark:text-neutral-100" : "text-neutral-500 dark:text-neutral-400"
+                            )}
+                        >
+                            {link.label}
+                        </Link>
                     ))}
-                    <li onClick={closeMenu}>
-                        <ResumeButton />
-                    </li>
-                </ul>
-            </div>
-        </nav>
-    );
-};
+                    <Link href="/resume">
+                        <Button variant="primary" size="sm" className="gap-2">
+                            <FileText className="h-4 w-4" />
+                            Resume
+                        </Button>
+                    </Link>
+                </nav>
 
-export default Navbar;
+                {/* Mobile Menu Button */}
+                <button
+                    className="md:hidden"
+                    onClick={() => setIsOpen(!isOpen)}
+                    aria-label="Toggle menu"
+                >
+                    {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                </button>
+            </Container>
+
+            {/* Mobile Nav */}
+            {isOpen && (
+                <div className="md:hidden border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950">
+                    <Container className="flex flex-col gap-4 py-6">
+                        {navLinks.map((link) => (
+                            <Link
+                                key={link.href}
+                                href={link.href}
+                                className={cn(
+                                    "text-base font-medium hover:text-neutral-900 dark:hover:text-neutral-100",
+                                    pathname === link.href ? "text-neutral-900 dark:text-neutral-100" : "text-neutral-500 dark:text-neutral-400"
+                                )}
+                                onClick={() => setIsOpen(false)}
+                            >
+                                {link.label}
+                            </Link>
+                        ))}
+                        <Link href="/resume" onClick={() => setIsOpen(false)}>
+                            <Button variant="primary" className="w-full gap-2">
+                                <FileText className="h-4 w-4" />
+                                Resume
+                            </Button>
+                        </Link>
+                        <div className="flex justify-start">
+                            <ThemeToggle />
+                        </div>
+                    </Container>
+                </div>
+            )}
+        </header>
+    );
+}
